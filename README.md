@@ -12,9 +12,16 @@ Verbum is a web application that analyzes Latin texts by looking up words, displ
 
 ## Screenshots
 
-| Main View | Word Frequency Chart |
-| :---: | :---: |
-| ![Main View](images/main_view.png) | ![Frequency Chart](images/frequency_chart.png) |
+<table>
+  <tr>
+    <td align="center"><strong>Main View</strong></td>
+    <td align="center"><strong>Word Frequency Chart</strong></td>
+  </tr>
+  <tr>
+    <td><img src="images/main_view.png" width="400"></td>
+    <td><img src="images/frequency_chart.png" width="400"></td>
+  </tr>
+</table>
 
 ## Installation
 
