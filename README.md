@@ -10,6 +10,12 @@ Verbum is a web application that analyzes Latin texts by looking up words, displ
 - **Interactive Navigation**: Click on the chart to jump to the corresponding text position – plateau detection ensures consistent selection.
 - **Caching**: Fast repeat analyses through intelligent server-side and client-side caching.
 
+## Screenshots
+
+| Main View | Word Frequency Chart |
+| :---: | :---: |
+| ![Main View](images/main_view.png) | ![Frequency Chart](images/frequency_chart.png) |
+
 ## Installation
 
 ### Requirements

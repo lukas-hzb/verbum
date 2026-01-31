@@ -162,7 +162,27 @@
                     body: JSON.stringify({ text })
                 });
 
-                const data = await response.json();
+                // Prüfe HTTP-Status
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    showError(`Server-Fehler (${response.status}): ${errorText || 'Unbekannter Fehler'}`);
+                    return;
+                }
+
+                // Prüfe ob Antwort leer ist
+                const responseText = await response.text();
+                if (!responseText) {
+                    showError('Server hat keine Antwort gesendet. Bitte versuche es erneut.');
+                    return;
+                }
+
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (parseError) {
+                    showError('Ungültige Server-Antwort. Bitte versuche es erneut.');
+                    return;
+                }
                 
                 if (data.error) {
                     showError(data.error);
@@ -176,7 +196,7 @@
                 analysisData = data;
                 displayResults(data);
             } catch (error) {
-                showError('Fehler bei der Analyse: ' + error.message);
+                showError('Verbindungsfehler: ' + error.message);
             } finally {
                 loadingOverlay.classList.add('hidden');
             }
