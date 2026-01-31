@@ -1,61 +1,57 @@
-# Verbum
+# Verbum - Latin Text Analyzer
 
-**Lateinischer Text-Analysator** – Analysiere lateinische Texte und finde Grundformen, Übersetzungen & Grammatik.
-
-![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
-![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)
-![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+Verbum is a web application that analyzes Latin texts by looking up words, displaying their base forms (lemmata), grammatical information, and translations. It combines a scraper for navigium.de with an interactive word frequency visualization.
 
 ## Features
 
-- 📖 **Wortanalyse** – Automatische Erkennung von Grundformen (Lemmata), grammatischen Informationen und Übersetzungen
-- 🔍 **Mehrdeutige Wörter** – Zeigt alle möglichen Bedeutungen für ambigue Formen (z.B. *cecidi*)
-- 📊 **Wortfrequenz-Diagramm** – Visualisiere die Verteilung bestimmter Wörter im Text
-- 🎯 **Interaktive Navigation** – Klicke auf das Diagramm, um zur entsprechenden Textstelle zu springen
-- ⚡ **Caching** – Schnelle Wiederholungsanalysen durch intelligentes Caching
+- **Word Analysis**: Automatic detection of base forms (lemmata), grammatical information, and translations for each word.
+- **Ambiguous Words**: Shows all possible meanings for ambiguous forms (e.g., *cecidi* can come from *caedo* or *cado*).
+- **Word Frequency Chart**: Visualize the distribution of specific words throughout the text with an interactive density diagram.
+- **Interactive Navigation**: Click on the chart to jump to the corresponding text position – plateau detection ensures consistent selection.
+- **Caching**: Fast repeat analyses through intelligent server-side and client-side caching.
 
 ## Installation
 
-### Voraussetzungen
+### Requirements
 
-- Python 3.8 oder höher
+- Python 3.8 or higher
 - pip
 
 ### Setup
 
 ```bash
-# Repository klonen
+# Clone repository
 git clone https://github.com/lukas-hzb/verbum.git
 cd verbum
 
-# Virtuelle Umgebung erstellen
+# Create virtual environment
 python3 -m venv .venv
 source .venv/bin/activate  # macOS/Linux
-# oder: .venv\Scripts\activate  # Windows
+# or: .venv\Scripts\activate  # Windows
 
-# Abhängigkeiten installieren
+# Install dependencies
 pip install -r requirements.txt
 
-# Server starten
+# Start server
 python app.py
 ```
 
-Die App läuft unter: **http://localhost:5000**
+The app runs at: **http://localhost:5000**
 
-## Verwendung
+## Usage
 
-1. Gib einen lateinischen Text in das linke Textfeld ein
-2. Klicke auf **"Text analysieren"**
-3. Die Analyse erscheint rechts mit Grundformen und Übersetzungen
-4. Wechsle zum Tab **"Wortfrequenz"** um die Verteilung bestimmter Wörter zu visualisieren
+1. Enter a Latin text in the left text field.
+2. Click **"Text analysieren"** (Analyze Text).
+3. The analysis appears on the right with base forms and translations.
+4. Switch to the **"Wortfrequenz"** (Word Frequency) tab to visualize the distribution of specific words.
 
-## Technologie
+## Technology
 
 - **Backend**: Flask (Python)
 - **Frontend**: Vanilla HTML/CSS/JavaScript
-- **Diagramme**: Chart.js
-- **Datenquelle**: navigium.de
+- **Charts**: Chart.js
+- **Data Source**: navigium.de
 
-## Lizenz
+## License
 
-MIT License – siehe [LICENSE](LICENSE)
+MIT License – see [LICENSE](LICENSE)
