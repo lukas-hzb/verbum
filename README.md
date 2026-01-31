@@ -1,6 +1,6 @@
 # Verbum - Latin Text Analyzer
 
-Verbum is a web application that analyzes Latin texts by looking up words, displaying their base forms (lemmata), grammatical information, and translations. It combines a scraper for navigium.de with an interactive word frequency visualization.
+Verbum is a web application for analyzing Latin texts. It looks up words to display base forms (lemmata), grammatical information, and translations. The interactive word frequency chart lets you visualize how specific words are distributed throughout the text and navigate directly to relevant passages.
 
 ## Features
 
