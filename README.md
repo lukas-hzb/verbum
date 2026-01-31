@@ -65,6 +65,12 @@ The app runs at: **http://localhost:5000**
 - **Charts**: Chart.js
 - **Data Source**: navigium.de
 
+## Credits & Acknowledgements
+
+A big thank you to the data sources that make this project possible:
+
+- **[navigium.de](https://www.navigium.de)**: For providing the comprehensive Latin dictionary and morphological analysis.
+
 ## License
 
 MIT License – see [LICENSE](LICENSE)
