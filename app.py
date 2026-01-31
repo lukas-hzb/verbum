@@ -206,4 +206,4 @@ if __name__ == '__main__':
         
         print(f"Lateinischer Text-Analysator: http://localhost:{PORT}")
     
-    app.run(debug=True, port=PORT)
+    app.run(debug=True, port=PORT, host='0.0.0.0')
