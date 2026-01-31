@@ -1,0 +1,744 @@
+/* ========================================
+   Latin Text Analyzer - WebTemplate Style
+   NEW COLOR PALETTE: Emerald/Teal
+   ======================================== */
+
+/* Google Fonts Import */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0');
+
+:root {
+    /* Colors - Light Mode with Emerald Accent (Refined for WebTemplate feel) */
+    --color-bg-body: hsl(160, 20%, 98%);
+    --color-bg-surface: hsl(0, 0%, 100%);
+    --color-bg-surface-hover: hsl(160, 15%, 96%);
+
+    /* Primary Colors - Emerald/Teal Palette (Keep hue but match luminosity of WebTemplate) */
+    --color-primary: #10b981;
+    --color-primary-muted: hsl(160, 84%, 45%);
+    --color-primary-muted-hover: hsl(160, 84%, 40%);
+
+    /* Text Colors - EXACT match from WebTemplate */
+    --color-text-main: rgb(20, 23, 31);
+    --color-text-muted: rgb(92, 97, 107);
+
+    /* Border Color - EXACT match from WebTemplate */
+    --color-border: rgb(225, 230, 237);
+
+    /* Accent Palette */
+    --color-accent-1: #ff6b6b; /* WebTemplate Red */
+    --color-accent-2: #ff9f43; /* WebTemplate Orange */
+    --color-accent-3: #10b981; /* Emerald */
+    --color-accent-4: #06b6d4; /* Cyan */
+    --color-accent-5: #6366f1; /* Indigo */
+    --color-accent-6: #8b5cf6; /* Violet */
+
+    /* Typography - WebTemplate Standard */
+    --font-family-base: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-family-display: 'Outfit', system-ui, -apple-system, sans-serif;
+
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 2rem;
+
+    /* Spacing - WebTemplate Standard */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+
+    --card-title-spacing: 0.7rem;
+
+    /* Radius - WebTemplate Standard */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1.5rem;
+    --radius-btn: 1rem;
+    --radius-full: 9999px;
+
+    /* Shadows - Refined for WebTemplate depth */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.08); /* Replaces previous -3px values */
+    --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --shadow-card-hover: 0 15px 40px rgba(16, 185, 129, 0.12);
+
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 300ms ease;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--color-bg-body);
+    color: var(--color-text-main);
+    font-family: var(--font-family-base);
+    height: 100vh;
+    line-height: 1.6;
+    overflow: hidden;
+}
+
+/* ========================================
+   LAYOUT
+   ======================================== */
+
+.app-container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: var(--space-6);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ========================================
+   HEADER CARD
+   ======================================== */
+
+.card-header {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-muted) 100%);
+    border: none;
+    border-radius: var(--radius-xl);
+    min-height: 160px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--space-8);
+    gap: var(--card-title-spacing);
+    box-shadow: 0 10px 30px rgba(16, 185, 129, 0.2);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: var(--space-8);
+}
+
+.card-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+}
+
+.card-header-title {
+    font-family: var(--font-family-display);
+    font-weight: 700;
+    font-size: var(--font-size-3xl);
+    color: white;
+    position: relative;
+    z-index: 1;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.card-header-subtitle {
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-lg);
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+    position: relative;
+    z-index: 1;
+    margin: 0;
+}
+
+/* ========================================
+   BASE CARD STYLES
+   ======================================== */
+
+.card-normal {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Allow card to shrink and trigger internal scrolling */
+}
+
+.card-normal-title {
+    font-family: var(--font-family-display);
+    font-weight: 700;
+    font-size: var(--font-size-xl);
+    color: var(--color-text-main);
+    margin: 0;
+    margin-bottom: var(--card-title-spacing);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.card-normal-title .material-symbols-outlined {
+    color: var(--color-primary);
+    font-size: 24px;
+}
+
+/* ========================================
+   GRID LAYOUT
+   ======================================== */
+
+.card-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-6);
+    flex: 1;
+    min-height: 0;
+}
+
+@media (max-width: 1024px) {
+    .card-grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ========================================
+   INPUT AREA
+   ======================================== */
+
+.card-input-group {
+    margin-bottom: var(--space-4);
+}
+
+.card-input-group:last-child {
+    margin-bottom: 0;
+}
+
+.card-input {
+    width: 100%;
+    padding: var(--space-4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-main);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    resize: none;
+}
+
+.card-input:focus {
+    outline: none;
+    border-color: var(--color-primary-muted);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+.card-input::placeholder {
+    color: rgba(75, 90, 85, 0.4); /* Much more subtle */
+    font-weight: 400;
+    font-style: italic;
+    opacity: 0.6;
+}
+
+.textarea-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    padding: 0;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.textarea-container:focus-within {
+    border-color: var(--color-primary-muted);
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+}
+
+textarea.card-input {
+    width: 100%;
+    min-height: 200px;
+    flex: 1;
+    border: none;
+    padding: var(--space-4);
+    background: transparent;
+    resize: none;
+    outline: none;
+    overflow-y: auto; /* Scrollbar on the textarea itself */
+}
+
+/* Outside scrollbar on textarea */
+textarea.card-input::-webkit-scrollbar {
+    width: 6px;
+}
+
+textarea.card-input::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+textarea.card-input::-webkit-scrollbar-thumb {
+    background: var(--color-primary-muted);
+    border-radius: var(--radius-full);
+}
+
+.input-section .card-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Critical for flex scrolling */
+}
+
+.input-section .btn-primary {
+    margin-top: auto;
+}
+
+/* ========================================
+   BUTTONS
+   ======================================== */
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: var(--color-primary);
+    color: white;
+    border-radius: var(--radius-btn);
+    font-weight: 600;
+    font-size: var(--font-size-base);
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: var(--font-family-base);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    width: 100%;
+    margin-top: var(--space-4);
+}
+
+.btn-primary:hover {
+    background: var(--color-primary-muted-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-bg-surface);
+    color: var(--color-text-muted);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: var(--font-family-base);
+}
+
+.btn-secondary:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background-color: var(--color-bg-surface-hover);
+}
+
+/* Example text buttons */
+.example-section {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border);
+}
+
+.example-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-3);
+    display: block;
+}
+
+.example-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+/* ========================================
+   RESULTS AREA
+   ======================================== */
+
+.results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--card-title-spacing);
+}
+
+.word-count-badge {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-primary);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.results-container {
+    display: block;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: var(--space-2);
+    position: relative;
+    mask-image: linear-gradient(to bottom, black, black calc(100% - 40px), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, black, black calc(100% - 40px), transparent);
+}
+
+.results-container > * {
+    margin-bottom: var(--space-4);
+}
+
+.results-container > *:last-child {
+    margin-bottom: 0;
+}
+
+.results-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.results-container::-webkit-scrollbar-track {
+    background: var(--color-border);
+    border-radius: var(--radius-full);
+}
+
+.results-container::-webkit-scrollbar-thumb {
+    background: var(--color-primary-muted);
+    border-radius: var(--radius-full);
+}
+
+/* Placeholder */
+.placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-8);
+    color: var(--color-text-muted);
+    text-align: center;
+    min-height: 200px;
+}
+
+.placeholder-icon {
+    font-size: 48px;
+    margin-bottom: var(--space-4);
+    opacity: 0.4;
+}
+
+.placeholder.error {
+    color: var(--color-accent-1);
+}
+
+.placeholder.error .placeholder-icon {
+    opacity: 0.7;
+}
+
+/* ========================================
+   WORD CARDS
+   ======================================== */
+
+.word-card {
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+}
+
+
+.word-card.not-found {
+    opacity: 0.7;
+}
+
+.word-header {
+    padding: var(--space-3) var(--space-4);
+    background: var(--color-bg-surface-hover);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.word-form {
+    font-family: var(--font-family-display);
+    font-size: var(--font-size-lg);
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.badge {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent-4));
+    color: white;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.meanings-list {
+    padding: var(--space-3) var(--space-4);
+}
+
+.meaning {
+    padding: var(--space-3) 0;
+}
+
+.meaning.has-border:not(:last-child) {
+    border-bottom: 1px dashed var(--color-border);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-4);
+}
+
+.meaning-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.lemma {
+    font-weight: 600;
+    color: var(--color-text-main);
+    font-size: var(--font-size-base);
+}
+
+.grammar {
+    color: var(--color-accent-3);
+    font-size: var(--font-size-sm);
+    font-style: italic;
+    background: rgba(16, 185, 129, 0.1);
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+}
+
+.translation {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+    line-height: 1.6;
+    margin-bottom: var(--space-2);
+}
+
+.source-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    color: var(--color-text-muted);
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.source-link:hover {
+    color: var(--color-primary);
+}
+
+/* ========================================
+   LOADING OVERLAY
+   ======================================== */
+
+.loading-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(8px);
+}
+
+.loading-overlay.hidden {
+    display: none;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--space-4);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-overlay p {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-lg);
+    font-weight: 500;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+/* ========================================
+   TABS
+   ======================================== */
+
+.results-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-3);
+}
+
+.tab-nav .word-count-badge {
+    margin-left: auto;
+}
+
+.tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: transparent;
+    color: var(--color-text-muted);
+    border: none;
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-family: var(--font-family-base);
+}
+
+.tab-btn:hover {
+    background: var(--color-bg-surface-hover);
+    color: var(--color-text-main);
+}
+
+.tab-btn.active {
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+.tab-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.tab-content {
+    display: none;
+    flex: 1;
+    min-height: 0;
+    overflow: visible; /* Allow shadows and hovers to breathe */
+}
+
+.tab-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Frequency Tab - Simplified after moving button */
+.frequency-controls {
+    margin-bottom: var(--space-4);
+}
+
+.frequency-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.frequency-input-group .card-input {
+    width: 100%;
+}
+
+.hint {
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+}
+
+.chart-container {
+    flex: 1;
+    min-height: 300px;
+    position: relative;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Tab action button */
+.btn-tab-action {
+    margin-top: var(--space-4);
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        padding: var(--space-4);
+    }
+
+    .card-header {
+        min-height: 120px;
+        padding: var(--space-6);
+    }
+
+    .card-header-title {
+        font-size: var(--font-size-2xl);
+    }
+
+    .card-header-subtitle {
+        font-size: var(--font-size-base);
+    }
+
+    textarea.card-input {
+        min-height: 200px;
+    }
+
+    .results-container {
+        max-height: 400px;
+    }
+
+    .frequency-input-group {
+        flex-direction: column;
+    }
+
+    .btn-small {
+        width: 100%;
+    }
+}

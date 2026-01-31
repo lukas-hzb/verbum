@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verbum</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header Card -->
+        <header class="card-header">
+            <h1 class="card-header-title">
+                Verbum
+            </h1>
+            <p class="card-header-subtitle">Analysiere lateinische Texte und finde Grundformen, Übersetzungen & Grammatik</p>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="card-grid-2">
+            <!-- Left Panel: Input -->
+            <section class="card-normal input-section">
+                <h2 class="card-normal-title">
+                    <span class="material-symbols-outlined">edit_note</span>
+                    Text eingeben
+                </h2>
+                <div class="card-input-group">
+                    <div class="textarea-container">
+                        <textarea 
+                            id="latin-text" 
+                            class="card-input"
+                            placeholder="Gib hier deinen lateinischen Text ein..."
+                            spellcheck="false"
+                        >Arma virumque cano Troiae qui primus ab oris.</textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Results with Tabs -->
+            <section class="card-normal results-section">
+                <!-- Tab Navigation -->
+                <div class="tab-nav">
+                    <button class="tab-btn active" data-tab="analysis">
+                        <span class="material-symbols-outlined">analytics</span>
+                        Analyse
+                    </button>
+                    <button class="tab-btn" data-tab="frequency">
+                        <span class="material-symbols-outlined">show_chart</span>
+                        Wortfrequenz
+                    </button>
+                    <span id="word-count" class="word-count-badge" style="display: none;"></span>
+                </div>
+
+                <!-- Tab 1: Analysis Results -->
+                <div id="tab-analysis" class="tab-content active">
+                    <div id="results" class="results-container">
+                        <div class="placeholder">
+                            <span class="material-symbols-outlined placeholder-icon">menu_book</span>
+                            <p>Klicke auf "Text analysieren" um den Text zu untersuchen</p>
+                        </div>
+                    </div>
+                    <button id="analyze-btn" class="btn-primary btn-tab-action">
+                        <span class="material-symbols-outlined">search</span>
+                        Text analysieren
+                    </button>
+                </div>
+
+                <!-- Tab 2: Word Frequency Chart -->
+                <div id="tab-frequency" class="tab-content">
+                    <div class="frequency-controls">
+                        <div class="card-input-group">
+                            <input type="text" id="search-words" class="card-input" 
+                                placeholder="z.B. amor, bellum, rex">
+                            <p class="hint">Trenne Wörter mit Komma, Semikolon oder anderem Zeichen</p>
+                        </div>
+                    </div>
+                    <div id="chart-container" class="chart-container">
+                        <div class="placeholder">
+                            <span class="material-symbols-outlined placeholder-icon">show_chart</span>
+                            <p>Gib oben Wörter ein, um deren Häufigkeit im Text zu analysieren</p>
+                        </div>
+                    </div>
+                    <button id="search-btn" class="btn-primary btn-tab-action">
+                        <span class="material-symbols-outlined">search</span>
+                        Suchen
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loading" class="loading-overlay hidden">
+            <div class="loading-spinner"></div>
+            <p>Analysiere Text...</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const textInput = document.getElementById('latin-text');
+        const resultsContainer = document.getElementById('results');
+        const wordCountSpan = document.getElementById('word-count');
+        const loadingOverlay = document.getElementById('loading');
+        const searchWordsInput = document.getElementById('search-words');
+        const searchBtn = document.getElementById('search-btn');
+        const chartContainer = document.getElementById('chart-container');
+        
+        // Store analysis data for chart
+        let analysisData = null;
+        let frequencyChart = null;
+
+        // Tab Navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+            });
+        });
+
+        // Analyse starten
+        analyzeBtn.addEventListener('click', analyzeText);
+        textInput.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'Enter') {
+                analyzeText();
+            }
+        });
+
+        // Wortfrequenz-Suche
+        searchBtn.addEventListener('click', searchWordFrequency);
+        searchWordsInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') searchWordFrequency();
+        });
+
+        // Cache für Analyse-Ergebnisse
+        let cachedText = null;
+        let cachedAnalysisData = null;
+
+        async function analyzeText() {
+            const text = textInput.value.trim();
+            if (!text) {
+                showError('Bitte gib einen Text ein.');
+                return;
+            }
+
+            // Prüfe ob Cache verwendet werden kann
+            if (cachedText === text && cachedAnalysisData) {
+                analysisData = cachedAnalysisData;
+                displayResults(cachedAnalysisData);
+                return;
+            }
+
+            loadingOverlay.classList.remove('hidden');
+            
+            try {
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                // Cache aktualisieren
+                cachedText = text;
+                cachedAnalysisData = data;
+                
+                analysisData = data;
+                displayResults(data);
+            } catch (error) {
+                showError('Fehler bei der Analyse: ' + error.message);
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        function displayResults(data) {
+            wordCountSpan.textContent = `${data.word_count} Wörter`;
+            wordCountSpan.style.display = data.results.length > 0 ? 'inline-block' : 'none';
+            
+            if (data.results.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="placeholder">
+                        <span class="material-symbols-outlined placeholder-icon">help_outline</span>
+                        <p>Keine analysierbaren Wörter gefunden</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            for (const wordData of data.results) {
+                html += createWordCard(wordData);
+            }
+            
+            resultsContainer.innerHTML = html;
+        }
+
+        function createWordCard(wordData) {
+            const { word, meanings, has_multiple } = wordData;
+            
+            let meaningsHtml = '';
+            for (const meaning of meanings) {
+                meaningsHtml += `
+                    <div class="meaning ${meanings.length > 1 ? 'has-border' : ''}">
+                        <div class="meaning-header">
+                            <span class="lemma">${meaning.lemma || 'Unbekannt'}</span>
+                            ${meaning.grammar ? `<span class="grammar">${meaning.grammar}</span>` : ''}
+                        </div>
+                        <div class="translation">
+                            ${meaning.translation || 'Keine Übersetzung gefunden'}
+                        </div>
+                    </div>
+                `;
+            }
+
+            return `
+                <div class="word-card ${has_multiple ? 'multiple-meanings' : ''} ${!meanings[0].found ? 'not-found' : ''}">
+                    <div class="word-header">
+                        <span class="word-form">${word}</span>
+                        ${has_multiple ? '<span class="badge">Mehrere Bedeutungen</span>' : ''}
+                    </div>
+                    <div class="meanings-list">
+                        ${meaningsHtml}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function searchWordFrequency() {
+            const searchInput = searchWordsInput.value.trim();
+            if (!searchInput) return;
+            
+            const text = textInput.value.trim();
+            if (!text) {
+                alert('Bitte zuerst einen Text eingeben und analysieren.');
+                return;
+            }
+
+            // Parse search words - split by any non-letter character
+            const searchWords = searchInput.split(/[^a-zA-ZäöüÄÖÜāēīōūĀĒĪŌŪ]+/).filter(w => w.length > 0);
+            if (searchWords.length === 0) return;
+
+            loadingOverlay.classList.remove('hidden');
+            
+            try {
+                const response = await fetch('/api/word-frequency', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, search_words: searchWords })
+                });
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    chartContainer.innerHTML = `<div class="placeholder error"><p>${data.error}</p></div>`;
+                    return;
+                }
+
+                displayFrequencyChart(data);
+            } catch (error) {
+                chartContainer.innerHTML = `<div class="placeholder error"><p>Fehler: ${error.message}</p></div>`;
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        function displayFrequencyChart(data) {
+            // Destroy existing chart
+            if (frequencyChart) {
+                frequencyChart.destroy();
+            }
+
+            // Create canvas
+            chartContainer.innerHTML = '<canvas id="frequency-canvas"></canvas>';
+            const ctx = document.getElementById('frequency-canvas').getContext('2d');
+
+            // Colors for different words
+            const colors = [
+                'rgba(16, 185, 129, 0.8)',   // Emerald
+                'rgba(6, 182, 212, 0.8)',    // Cyan
+                'rgba(99, 102, 241, 0.8)',   // Indigo
+                'rgba(245, 158, 11, 0.8)',   // Orange
+                'rgba(239, 68, 68, 0.8)',    // Red
+                'rgba(139, 92, 246, 0.8)',   // Violet
+            ];
+
+            // Calculate window radius: 2.5% of text length, capped at max 25 words
+            const windowRadius = Math.min(25, Math.ceil(data.total_words * 0.025));
+
+            // Build datasets
+            const datasets = [];
+
+            // 1. Calculate and add Cumulative Background Curve (Broader trend)
+            const cumulativeRadius = windowRadius * 3;
+            if (data.word_data.length > 1) {
+                const cumulativeData = [];
+                
+                for (let pos = 1; pos <= data.total_words; pos++) {
+                    let totalAtPos = 0;
+                    const cWindowStart = Math.max(1, pos - cumulativeRadius);
+                    const cWindowEnd = Math.min(data.total_words, pos + cumulativeRadius);
+                    
+                    data.word_data.forEach(wordInfo => {
+                        for (const occPos of wordInfo.positions) {
+                            if (occPos >= cWindowStart && occPos <= cWindowEnd) {
+                                totalAtPos++;
+                            }
+                        }
+                    });
+                    cumulativeData.push({ x: pos, y: totalAtPos });
+                }
+
+                // Find peak for auto-jump with plateau centering
+                let maxVal = -1;
+                let peakPos = 1;
+                cumulativeData.forEach(p => {
+                    if (p.y > maxVal) {
+                        maxVal = p.y;
+                        peakPos = p.x;
+                    }
+                });
+                
+                // Finde Plateau-Grenzen für Auto-Jump (gleiche Logik wie onClick)
+                let autoLeftIdx = peakPos - 1;
+                let autoRightIdx = peakPos - 1;
+                while (autoLeftIdx > 0 && cumulativeData[autoLeftIdx - 1]?.y === maxVal) {
+                    autoLeftIdx--;
+                }
+                while (autoRightIdx < cumulativeData.length - 1 && cumulativeData[autoRightIdx + 1]?.y === maxVal) {
+                    autoRightIdx++;
+                }
+                const autoPlateauCenter = Math.round((autoLeftIdx + autoRightIdx) / 2) + 1;
+                
+                // Auto-jump to plateau center
+                setTimeout(() => selectTextPosition(autoPlateauCenter, cumulativeRadius), 100);
+
+                datasets.push({
+                    label: 'Gesamt-Häufigkeit',
+                    data: cumulativeData,
+                    borderColor: 'rgba(92, 97, 107, 0.4)',
+                    backgroundColor: 'rgba(92, 97, 107, 0.05)',
+                    borderWidth: 1.5,
+                    fill: true,
+                    pointRadius: 0,
+                    tension: 0.4,
+                    isCumulative: true,
+                    order: 10 // Background
+                });
+            }
+
+            // 2. Add individual word datasets
+            data.word_data.forEach((wordInfo, index) => {
+                const frequencyData = [];
+                for (let pos = 1; pos <= data.total_words; pos++) {
+                    const windowStart = Math.max(1, pos - windowRadius);
+                    const windowEnd = Math.min(data.total_words, pos + windowRadius);
+                    let count = 0;
+                    for (const occPos of wordInfo.positions) {
+                        if (occPos >= windowStart && occPos <= windowEnd) {
+                            count++;
+                        }
+                    }
+                    frequencyData.push({ x: pos, y: count });
+                }
+
+                datasets.push({
+                    label: wordInfo.search_word,
+                    totalCount: wordInfo.count,
+                    data: frequencyData,
+                    borderColor: colors[index % colors.length],
+                    backgroundColor: colors[index % colors.length].replace('0.8', '0.1'),
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    fill: false,
+                    tension: 0.4,
+                    order: index
+                });
+            });
+
+            // Find max frequency for y-axis
+            const maxFreq = Math.max(...datasets.flatMap(d => d.data.map(p => p.y)), 1);
+
+            // Create line chart showing word frequency density
+            frequencyChart = new Chart(ctx, {
+                type: 'line',
+                data: { datasets },
+                options: {
+                    onClick: (event, elements, chart) => {
+                        const canvasPosition = Chart.helpers.getRelativePosition(event, chart);
+                        const dataX = chart.scales.x.getValueForPixel(canvasPosition.x);
+                        const wordIdx = Math.round(dataX);
+                        
+                        if (wordIdx >= 1 && wordIdx <= data.total_words) {
+                            const cumulativeDataset = chart.data.datasets.find(ds => ds.isCumulative);
+                            if (!cumulativeDataset) return;
+                            
+                            const val = cumulativeDataset.data[wordIdx - 1]?.y || 0;
+                            if (val <= 0) return;
+                            
+                            // Finde Plateau-Grenzen (links und rechts scannen)
+                            let leftIdx = wordIdx - 1;
+                            let rightIdx = wordIdx - 1;
+                            
+                            // Nach links scannen
+                            while (leftIdx > 0 && cumulativeDataset.data[leftIdx - 1]?.y === val) {
+                                leftIdx--;
+                            }
+                            // Nach rechts scannen
+                            while (rightIdx < cumulativeDataset.data.length - 1 && cumulativeDataset.data[rightIdx + 1]?.y === val) {
+                                rightIdx++;
+                            }
+                            
+                            // Mitte des Plateaus berechnen (1-basiert)
+                            const plateauCenter = Math.round((leftIdx + rightIdx) / 2) + 1;
+                            selectTextPosition(plateauCenter, cumulativeRadius);
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Wortdichte im Text',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    if (context.dataset.isCumulative) {
+                                        return `Gesamt: ${context.raw.y} im erweiterten Radius`;
+                                    }
+                                    const word = context.dataset.label;
+                                    const countAtPos = context.raw.y;
+                                    const total = context.dataset.totalCount;
+                                    return `${word}: ${countAtPos} im Radius [Gesamt: ${total}x]`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            title: {
+                                display: true,
+                                text: 'Position im Text (Wörter)'
+                            },
+                            min: 1,
+                            max: data.total_words
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Vorkommen im Radius'
+                            },
+                            min: 0,
+                            suggestedMax: maxFreq + 1,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function selectTextPosition(wordIndex, radius = 5) {
+            const text = textInput.value;
+            const regex = /[a-zA-ZäöüÄÖÜāēīōūĀĒĪŌŪ]+/g;
+            let matches = [];
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                matches.push({
+                    index: match.index,
+                    length: match[0].length,
+                    end: match.index + match[0].length
+                });
+            }
+
+            if (matches.length === 0) return;
+
+            // wordIndex ist 1-basiert vom Chart
+            const targetIdx = Math.max(0, Math.min(Math.round(wordIndex) - 1, matches.length - 1));
+            
+            // Suchradius für Kontext
+            const startIdx = Math.max(0, targetIdx - radius);
+            const endIdx = Math.min(matches.length - 1, targetIdx + radius);
+
+            const charStart = matches[startIdx].index;
+            const charEnd = matches[endIdx].end;
+
+            textInput.focus();
+            textInput.setSelectionRange(charStart, charEnd);
+            
+            // Zentrierung: Berechne Position der Mitte der Auswahl
+            const selectionMidChar = Math.floor((charStart + charEnd) / 2);
+            
+            // Erstelle ein temporäres Element um die exakte Pixel-Position zu messen
+            const measureDiv = document.createElement('div');
+            const styles = window.getComputedStyle(textInput);
+            measureDiv.style.cssText = `
+                position: absolute;
+                visibility: hidden;
+                white-space: pre-wrap;
+                word-wrap: break-word;
+                width: ${textInput.clientWidth}px;
+                font: ${styles.font};
+                line-height: ${styles.lineHeight};
+                padding: ${styles.padding};
+            `;
+            measureDiv.textContent = text.substring(0, selectionMidChar);
+            document.body.appendChild(measureDiv);
+            
+            const textHeight = measureDiv.offsetHeight;
+            document.body.removeChild(measureDiv);
+            
+            // Scrolle so dass die Mitte der Auswahl im Zentrum des Textfelds ist
+            textInput.scrollTop = textHeight - (textInput.clientHeight / 2);
+        }
+
+        function showError(message) {
+            resultsContainer.innerHTML = `
+                <div class="placeholder error">
+                    <span class="material-symbols-outlined placeholder-icon">error_outline</span>
+                    <p>${message}</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
